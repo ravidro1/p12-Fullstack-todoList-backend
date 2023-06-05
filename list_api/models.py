@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# from list_api.managers import CustomUserManager
 
 class CustomUser(AbstractUser):
     first_name = None
@@ -16,21 +15,9 @@ class CustomUser(AbstractUser):
 
 
     is_active= models.BooleanField(default=True)
-    is_staff= models.BooleanField(default=False)
-
+ 
     REQUIRED_FIELDS = []
 
-    # USERNAME_FIELD = "username"
-    # REQUIRED_FIELDS = ['username', "password"]
-
-    # objects = CustomUserManager()
-
-    # email = models.EmailField(max_length=50, unique=True)
-    # first_name = models.CharField(max_length=255)
-    # last_name = models.CharField(max_length=255)
-
-    # username = models.CharField(max_length=50, unique=True)
-    # password = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.username
@@ -44,15 +31,6 @@ class UserToken(models.Model):
 
     def __str__(self):
         return self.user_id
-
-class Reset(models.Model):
-    username = models.CharField(max_length=255)
-    token = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return self.username
-    
-    
 
 class List(models.Model):
     id = models.AutoField(primary_key=True)

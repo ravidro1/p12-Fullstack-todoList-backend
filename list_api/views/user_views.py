@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status,exceptions
+from rest_framework import exceptions
 from list_api.serializers.user_serializer import UserSerializer
-from list_api.models import CustomUser, UserToken, Reset
-import datetime, random, string
+from list_api.models import CustomUser, UserToken
+import datetime
 
 
 
@@ -42,8 +42,6 @@ class SignUp(APIView):
         }
         
         return response
-        # return Response(serializer.data)
-
 
 class Login(APIView):
     def post(self,request):

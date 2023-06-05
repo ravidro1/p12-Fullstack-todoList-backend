@@ -51,13 +51,7 @@ class JWTAuthentication(BaseAuthentication):
             user_id = decode_access_token(token)
 
             user = CustomUser.objects.get(pk=user_id)
-            # user = CustomUser.objects.get(pk=user_id)
-            # print("userauth : " , user)
-
-            # print(user)
-            # print("\033[1;32m This text is Bright Green  \n")
-
-            # return user
+    
             return (user, None)
         raise exceptions.AuthenticationFailed('unauthenticated')     
 
