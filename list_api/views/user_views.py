@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import exceptions
+from rest_framework import exceptions, status
 from list_api.serializers.user_serializer import UserSerializer
 from list_api.models import CustomUser, UserToken
 import datetime
@@ -13,66 +13,72 @@ from list_api.authentication import create_access_token, create_refresh_token, J
 
 class SignUp(APIView):
     def post(self, request):
-        data = request.data
+        try:
+            data = request.data
 
-        if data['password'] != data['password_confirm']:
-            raise exceptions.APIException('Password do not match to confirm-password')
-        
-        serializer = UserSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+            if data['password'] != data['password_confirm']:
+                raise exceptions.APIException('Password do not match to confirm-password')
+            
+            serializer = UserSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
 
-        user = serializer.data
-        print("user: " , user)
-        access_token = create_access_token(user["id"])
-        refresh_token = create_refresh_token(user["id"])
-
-
-        UserToken.objects.create(user_id=user["id"],
-                                  token=refresh_token,
-                                  expired_at= datetime.datetime.utcnow() + datetime.timedelta(days=7))
+            user = serializer.data
+            print("user: " , user)
+            access_token = create_access_token(user["id"])
+            refresh_token = create_refresh_token(user["id"])
 
 
-        response = Response()
+            UserToken.objects.create(user_id=user["id"],
+                                    token=refresh_token,
+                                    expired_at= datetime.datetime.utcnow() + datetime.timedelta(days=7))
 
-        response.set_cookie(key='refresh_token', value=refresh_token, httponly=True)
 
-        response.data = {
-            'token': access_token
-        }
-        
-        return response
+            response = Response()
+
+            response.set_cookie(key='refresh_token', value=refresh_token, httponly=True)
+
+            response.data = {
+                'token': access_token
+            }
+            
+            return response
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class Login(APIView):
     def post(self,request):
-        username = request.data['username']
-        password = request.data['password']
+        try:
+            username = request.data['username']
+            password = request.data['password']
 
-        user =  CustomUser.objects.filter(username=username).first()
+            user =  CustomUser.objects.filter(username=username).first()
 
-        if user is None:
-            raise exceptions.AuthenticationFailed('Invalid credentials')
-        
-        if not user.check_password(password):
-            raise exceptions.AuthenticationFailed('Invalid credentials')
-        
-        access_token = create_access_token(user.id)
-        refresh_token = create_refresh_token(user.id)
+            if user is None:
+                raise exceptions.AuthenticationFailed('Invalid credentials')
+            
+            if not user.check_password(password):
+                raise exceptions.AuthenticationFailed('Invalid credentials')
+            
+            access_token = create_access_token(user.id)
+            refresh_token = create_refresh_token(user.id)
 
 
-        UserToken.objects.create(user_id=user.id,
-                                  token=refresh_token,
-                                  expired_at= datetime.datetime.utcnow() + datetime.timedelta(days=7))
+            UserToken.objects.create(user_id=user.id,
+                                    token=refresh_token,
+                                    expired_at= datetime.datetime.utcnow() + datetime.timedelta(days=7))
 
-        response = Response()
+            response = Response()
 
-        response.set_cookie(key='refresh_token', value=refresh_token, httponly=True)
+            response.set_cookie(key='refresh_token', value=refresh_token, httponly=True)
 
-        response.data = {
-            'token': access_token
-        }
-        
-        return response
+            response.data = {
+                'token': access_token
+            }
+            
+            return response
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class GetUser(APIView):
     authentication_classes = [JWTAuthentication]
